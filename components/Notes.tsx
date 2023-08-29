@@ -4,19 +4,25 @@ import { APIClient } from '../lib/api_client';
 import { INote } from '../types/note';
 import { applyStandardDateTimeFormat } from '../lib/date_time';
 
-import { Table } from 'antd';
+import { Col, Row, Popconfirm, Table, Button } from 'antd';
 import { SearchBar } from './SearchBar';
+import {
+  DeleteTwoTone,
+  EditTwoTone,
+  PlusCircleOutlined,
+} from '@ant-design/icons';
+import { NoteEditor } from './NoteEditor';
 
 const api = new APIClient();
 
-interface INoteState extends INote {
-  hidden: boolean; // Control search visibility
+interface INoteStateItem extends INote {
+  hidden?: boolean; // Control search visibility
 }
 
 export function Notes(): JSX.Element {
-  const [mounted, setMounted] = useState<boolean>(false); // @TODO fix render flash
+  const [mounted, setMounted] = useState<boolean>(false); // @TODO fix render flash hack
   const [loading, setLoading] = useState<boolean>(true);
-  const [notes, setNotes] = useState<INoteState[]>([]);
+  const [notes, setNotes] = useState<INoteStateItem[]>([]);
   const getNotes = async () => {
     setLoading(true);
     const res = await api.call('getNotes', {});
@@ -24,6 +30,15 @@ export function Notes(): JSX.Element {
     setLoading(false);
     setMounted(true);
   };
+
+  const onNoteSave = (note: INote, type: 'update' | 'create') => {
+    if (type === 'update') {
+      setNotes(notes.map(n => (n.id === note.id ? note : n)));
+    } else if (type === 'create') {
+      setNotes([note, ...notes]);
+    }
+  };
+
   useEffect(() => {
     getNotes();
   }, []);
@@ -31,17 +46,36 @@ export function Notes(): JSX.Element {
     <div className='notes'>
       {mounted && (
         <>
-          <SearchBar
-            onSearch={(str: string) => {
-              setNotes(
-                notes.map(note =>
-                  note.title.includes(str)
-                    ? { ...note, hidden: false }
-                    : { ...note, hidden: true }
-                )
-              );
-            }}
-          />
+          <Row gutter={20}>
+            <Col flex={0}>
+              <NoteEditor
+                onSave={onNoteSave}
+                trigger={
+                  <Button
+                    style={{ fontSize: '1em' }}
+                    size='large'
+                    type='primary'
+                    icon={<PlusCircleOutlined />}
+                  >
+                    Create New Note
+                  </Button>
+                }
+              />
+            </Col>
+            <Col flex={1}>
+              <SearchBar
+                onSearch={(str: string) => {
+                  setNotes(
+                    notes.map(note =>
+                      note.title.includes(str)
+                        ? { ...note, hidden: false }
+                        : { ...note, hidden: true }
+                    )
+                  );
+                }}
+              />
+            </Col>
+          </Row>
           <Table
             style={{ width: '100%' }}
             bordered
@@ -75,6 +109,36 @@ export function Notes(): JSX.Element {
                   compare: (a, b) =>
                     Date.parse(a.updated_at) - Date.parse(b.updated_at),
                 },
+              },
+              {
+                title: '',
+                width: 50,
+                render: note => (
+                  <NoteEditor
+                    note={note}
+                    trigger={<EditTwoTone style={{ cursor: 'pointer' }} />}
+                    onSave={onNoteSave}
+                  />
+                ),
+              },
+              {
+                title: '',
+                width: 50,
+                render: note => (
+                  <Popconfirm
+                    title='Delete this note?'
+                    icon={false}
+                    onConfirm={async () => {
+                      await api.call('deleteNote', { body: { id: note.id } });
+                      setNotes(notes.filter(n => n.id !== note.id));
+                    }}
+                  >
+                    <DeleteTwoTone
+                      twoToneColor={'#ff4d4f'}
+                      style={{ cursor: 'pointer' }}
+                    />
+                  </Popconfirm>
+                ),
               },
             ]}
             rowKey={note => note.id}

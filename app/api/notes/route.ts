@@ -67,8 +67,12 @@ export async function POST(request: NextRequest): Promise<NextResponse | void> {
   return handler(async () => {
     const body = await request.json();
     validateNote(body);
-    body.id = uuidv4();
-    const data = await db.insert('notes', body);
+    const data = await db.insert('notes', {
+      ...body,
+      id: uuidv4(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
     return NextResponse.json(data, { status: 201 });
   });
 }
@@ -79,7 +83,14 @@ export async function PATCH(
   return handler(async () => {
     const body = await request.json();
     validateNote(body);
-    const data = await db.update('notes', { id: body.id }, body);
+    const data = await db.update(
+      'notes',
+      { id: body.id },
+      {
+        ...body,
+        updated_at: new Date().toISOString(),
+      }
+    );
     return NextResponse.json(data, { status: 200 });
   });
 }
