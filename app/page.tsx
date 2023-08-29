@@ -1,7 +1,9 @@
+import { Notes } from '../components/Notes';
+
 export default function Home() {
   return (
     <main>
-      <h1>Solace Notes</h1>
+      <Notes />
     </main>
-  )
+  );
 }
