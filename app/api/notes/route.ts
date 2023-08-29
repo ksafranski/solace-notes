@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { v4 as uuidv4 } from 'uuid';
 import MockDB from '../../../__mocks/mockdb';
 import { INote } from '../../../types/note';
 
@@ -22,7 +23,7 @@ class ValidationError extends Error {
  */
 const handler = async (fn: () => void): Promise<NextResponse | void> => {
   try {
-    return await fn();
+    return fn();
   } catch (e) {
     return e instanceof ValidationError
       ? NextResponse.json({ error: e.message }, { status: 400 })
@@ -66,6 +67,7 @@ export async function POST(request: NextRequest): Promise<NextResponse | void> {
   return handler(async () => {
     const body = await request.json();
     validateNote(body);
+    body.id = uuidv4();
     const data = await db.insert('notes', body);
     return NextResponse.json(data, { status: 201 });
   });

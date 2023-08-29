@@ -5,6 +5,10 @@ interface IGetNotesParams {
   page?: number;
 }
 
+interface IUpdateNoteParams {
+  body: INote;
+}
+
 interface IDefinitions {
   [key: string]: (params: any) => {
     url: string;
@@ -19,6 +23,27 @@ const definitions: IDefinitions = {
       method: 'get',
     };
   },
+  createNote: (params: IUpdateNoteParams) => {
+    return {
+      url: '/api/notes',
+      method: 'post',
+      body: params.body,
+    };
+  },
+  updateNote: (params: IUpdateNoteParams) => {
+    return {
+      url: `/api/notes/`,
+      method: 'patch',
+      body: params.body,
+    };
+  },
+  deleteNote: (params: IUpdateNoteParams) => {
+    return {
+      url: `/api/notes/`,
+      method: 'delete',
+      body: params.body,
+    };
+  },
 };
 
 type IDefintionsKeys = keyof typeof definitions;
@@ -26,7 +51,7 @@ type IDefintionsKeys = keyof typeof definitions;
 export class APIClient {
   [key: string]: any; // Call sig for dynamic methods
 
-  async get(url: string) {
+  async get(url: string): Promise<Response> {
     return await fetch(url);
   }
 
@@ -50,9 +75,10 @@ export class APIClient {
     });
   }
 
-  async delete(url: string): Promise<Response> {
+  async delete(url: string, params: any): Promise<Response> {
     return await fetch(url, {
       method: 'DELETE',
+      body: JSON.stringify(params.body),
     });
   }
 
