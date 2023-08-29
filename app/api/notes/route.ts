@@ -69,7 +69,7 @@ export async function POST(request: NextRequest): Promise<NextResponse | void> {
     validateNote(body);
     const data = await db.insert('notes', {
       ...body,
-      id: uuidv4(),
+      id: body.id || uuidv4(),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     });

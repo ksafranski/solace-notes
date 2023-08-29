@@ -85,7 +85,7 @@ export function NoteEditor({
         <Space
           direction='vertical'
           size='large'
-          style={{ width: '100%', margin: '1rem 0' }}
+          style={{ width: '100%', margin: '1rem 0 2em 0' }}
         >
           <Input
             value={currentNote.title}
@@ -102,6 +102,16 @@ export function NoteEditor({
             minLength={20}
             rows={7}
           />
+          <p
+            style={{
+              fontSize: '0.9em',
+              color: currentNote.content.length < 20 ? '#cd5454' : '#ccc',
+              margin: '-1.35rem 0 0 .5em',
+              padding: 0,
+            }}
+          >
+            Must be at least 20 characters
+          </p>
         </Space>
       </Modal>
       <span onClick={() => setVisible(true)}>{trigger}</span>

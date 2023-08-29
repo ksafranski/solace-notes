@@ -67,7 +67,7 @@ export function Notes(): JSX.Element {
                 onSearch={(str: string) => {
                   setNotes(
                     notes.map(note =>
-                      note.title.includes(str)
+                      note.title.toLowerCase().includes(str.toLowerCase())
                         ? { ...note, hidden: false }
                         : { ...note, hidden: true }
                     )
