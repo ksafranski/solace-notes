@@ -10,9 +10,9 @@ Per the assignment summary:
 ## Acceptance Criteria
 
 - [x] Must be written with JavaScript or Typescript (preferred)
-- Note Form must have the following validations:
-- [x] Must not be shorter then 20 characters
-- [x] Must not be longer then 300 characters
+- [x] Note Form must have the following validations:
+  - [x] Must not be shorter then 20 characters
+  - [x] Must not be longer then 300 characters
 - [x] Main page must include all the notes and a way to create a new note
 - [x] Main page must include a search bar that will find based on a notes content(Client or Server query is fine)
 - [x] Must include README with steps on how to run the application(s) locally.
