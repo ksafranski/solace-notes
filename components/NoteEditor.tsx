@@ -1,12 +1,6 @@
-/**
- * Note: this could be more atomic with a separate modal wrapper but
- * keeping it simple for now
- */
-
 import { useEffect, useState } from 'react';
 import { Input, Modal, Space, message } from 'antd';
 import { INote } from '../types/note';
-import TextArea from 'antd/es/input/TextArea';
 import { CheckOutlined, LoadingOutlined } from '@ant-design/icons';
 import { APIClient } from '../lib/api_client';
 
@@ -52,6 +46,7 @@ export function NoteEditor({
       const res = currentNote.id
         ? await api.call('updateNote', { body: currentNote })
         : await api.call('createNote', { body: currentNote });
+      // Fire callback from props
       onSave && onSave(res, currentNote.id ? 'update' : 'create');
       message.success(`Note saved ${currentNote.id ? 'updated' : 'created'}!`);
       setCurrentNote(res);
@@ -94,7 +89,7 @@ export function NoteEditor({
             }}
             placeholder='Title'
           />
-          <TextArea
+          <Input.TextArea
             value={currentNote.content}
             onChange={e => updateNoteProp('content', e.target.value)}
             showCount

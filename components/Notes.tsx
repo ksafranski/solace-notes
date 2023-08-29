@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { APIClient } from '../lib/api_client';
 import { INote } from '../types/note';
 import { applyStandardDateTimeFormat } from '../lib/date_time';
-
 import { Col, Row, Popconfirm, Table, Button } from 'antd';
 import { SearchBar } from './SearchBar';
 import {
@@ -23,6 +22,7 @@ export function Notes(): JSX.Element {
   const [mounted, setMounted] = useState<boolean>(false); // @TODO fix render flash hack
   const [loading, setLoading] = useState<boolean>(true);
   const [notes, setNotes] = useState<INoteStateItem[]>([]);
+
   const getNotes = async () => {
     setLoading(true);
     const res = await api.call('getNotes', {});
@@ -31,6 +31,7 @@ export function Notes(): JSX.Element {
     setMounted(true);
   };
 
+  // Callback for NoteEditor to handle resync on state after create/update
   const onNoteSave = (note: INote, type: 'update' | 'create') => {
     if (type === 'update') {
       setNotes(notes.map(n => (n.id === note.id ? note : n)));
@@ -42,6 +43,7 @@ export function Notes(): JSX.Element {
   useEffect(() => {
     getNotes();
   }, []);
+
   return (
     <div className='notes'>
       {mounted && (

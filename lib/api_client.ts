@@ -5,7 +5,7 @@ interface IGetNotesParams {
   page?: number;
 }
 
-interface IUpdateNoteParams {
+interface IPayloadNoteParams {
   body: INote;
 }
 
@@ -23,21 +23,21 @@ const definitions: IDefinitions = {
       method: 'get',
     };
   },
-  createNote: (params: IUpdateNoteParams) => {
+  createNote: (params: IPayloadNoteParams) => {
     return {
       url: '/api/notes',
       method: 'post',
       body: params.body,
     };
   },
-  updateNote: (params: IUpdateNoteParams) => {
+  updateNote: (params: IPayloadNoteParams) => {
     return {
       url: `/api/notes/`,
       method: 'patch',
       body: params.body,
     };
   },
-  deleteNote: (params: IUpdateNoteParams) => {
+  deleteNote: (params: IPayloadNoteParams) => {
     return {
       url: `/api/notes/`,
       method: 'delete',
