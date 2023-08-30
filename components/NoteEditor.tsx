@@ -48,7 +48,9 @@ export function NoteEditor({
         : await api.call('createNote', { body: currentNote });
       // Fire callback from props
       onSave && onSave(res, currentNote.id ? 'update' : 'create');
-      message.success(`Note saved ${currentNote.id ? 'updated' : 'created'}!`);
+      message.success(
+        `Note ${currentNote.id ? 'updated' : 'created'} successfully!`
+      );
       setCurrentNote(res);
     } catch (err: any) {
       message.error(`Failed to save note: ${err.message}`);
