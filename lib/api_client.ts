@@ -3,6 +3,7 @@ import { INote } from '../types/note';
 interface IGetNotesParams {
   limit?: number;
   page?: number;
+  merge?: string;
 }
 
 interface IPayloadNoteParams {
@@ -19,7 +20,7 @@ interface IDefinitions {
 const definitions: IDefinitions = {
   getNotes: (params: IGetNotesParams) => {
     return {
-      url: `/api/notes?limit=${params.limit}&page=${params.page}`,
+      url: `/api/notes?limit=${params.limit}&page=${params.page}&merge=${params.merge}`,
       method: 'get',
     };
   },
@@ -42,6 +43,12 @@ const definitions: IDefinitions = {
       url: `/api/notes/`,
       method: 'delete',
       body: params.body,
+    };
+  },
+  getPatients: () => {
+    return {
+      url: `/api/patients`,
+      method: 'get',
     };
   },
 };

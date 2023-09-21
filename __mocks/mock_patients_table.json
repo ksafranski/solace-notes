@@ -1,0 +1,23 @@
+[
+  {
+    "id": "9c9da632-510d-4bc9-b736-fa4839508475",
+    "created_at": "2023-03-15T01:44:01Z",
+    "updated_at": "2023-01-10T15:59:08Z",
+    "first_name": "Bob",
+    "last_name": "Smith"
+  },
+  {
+    "id": "9c9da632-510d-4bc9-b736-fa48395bc563",
+    "created_at": "2023-03-15T01:44:01Z",
+    "updated_at": "2023-01-10T15:59:08Z",
+    "first_name": "Mary",
+    "last_name": "Jones"
+  },
+  {
+    "id": "9c9da632-510d-4bc9-b736-fa48395bbaf7",
+    "created_at": "2023-03-15T01:44:01Z",
+    "updated_at": "2023-01-10T15:59:08Z",
+    "first_name": "Will",
+    "last_name": "Johnson"
+  }
+]

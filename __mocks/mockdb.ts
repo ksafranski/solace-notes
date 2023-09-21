@@ -1,4 +1,5 @@
 import mock_notes_table from './mock_notes_table.json';
+import mock_patients_table from './mock_patients_table.json';
 
 interface IQuery {
   [key: string]: string | number | boolean | null | undefined;
@@ -14,12 +15,14 @@ interface IGetParams {
 // Create fake store of data as tables
 const tables: any = {
   notes: mock_notes_table,
+  patients: mock_patients_table,
 };
 
 export default class MockDB {
   public async find<T>(params: IGetParams): Promise<T[]> {
     const { table, query, limit = 1000, page = 1 } = params;
     let data = tables[table];
+    console.log('QUERY', query);
     // Handle key/value query
     if (query) {
       const keys = Object.keys(query);

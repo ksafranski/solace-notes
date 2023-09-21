@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Input, Modal, Space, message } from 'antd';
+import { Input, Modal, Select, Space, message } from 'antd';
 import { INote } from '../types/note';
 import { CheckOutlined, LoadingOutlined } from '@ant-design/icons';
 import { APIClient } from '../lib/api_client';
+import { IPatient } from '../types/patient';
 
 interface INoteEditorProps {
+  patients: IPatient[];
   note?: INote | Omit<INote, 'id'>;
   trigger: JSX.Element;
   onSave?: (note: INote, type: 'update' | 'create') => void;
@@ -13,6 +15,7 @@ interface INoteEditorProps {
 const noteTemplate: Omit<INote, 'id'> & Partial<Pick<INote, 'id'>> = {
   title: '',
   content: '',
+  patient_id: '',
   created_at: '',
   updated_at: '',
 };
@@ -20,6 +23,7 @@ const noteTemplate: Omit<INote, 'id'> & Partial<Pick<INote, 'id'>> = {
 const api = new APIClient();
 
 export function NoteEditor({
+  patients,
   note = noteTemplate,
   trigger,
   onSave,
@@ -66,6 +70,7 @@ export function NoteEditor({
         cancelText='Close'
         okButtonProps={{
           disabled:
+            !currentNote.patient_id ||
             !currentNote.title ||
             !currentNote.content ||
             currentNote.content.length < 20 ||
@@ -84,12 +89,25 @@ export function NoteEditor({
           size='large'
           style={{ width: '100%', margin: '1rem 0 2em 0' }}
         >
+          <Select
+            value={currentNote.patient_id}
+            onChange={value => updateNoteProp('patient_id', value)}
+            placeholder='Select Patient'
+            style={{ width: '100%' }}
+            options={patients.map((p: IPatient) => ({
+              label: `${p.first_name} ${p.last_name}`,
+              value: p.id,
+              key: p.id,
+            }))}
+            status={currentNote.patient_id ? '' : 'error'}
+          />
           <Input
             value={currentNote.title}
             onChange={e => {
               updateNoteProp('title', e.target.value);
             }}
             placeholder='Title'
+            status={currentNote.title ? '' : 'error'}
           />
           <Input.TextArea
             value={currentNote.content}

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import MockDB from '../../../__mocks/mockdb';
 import { INote } from '../../../types/note';
+import { IPatient } from '../../../types/patient';
 
 /**
  * This is a custom error class that we will use to throw validation errors
@@ -42,6 +43,9 @@ const db = new MockDB();
 
 // Basic server-side validation will throw up to handler
 const validateNote = (note: INote): ValidationError | void => {
+  if (!note.patient_id) {
+    throw new ValidationError('Note must have a patient associated');
+  }
   if (!note.title) {
     throw new ValidationError('Note must have a title');
   }
@@ -50,15 +54,30 @@ const validateNote = (note: INote): ValidationError | void => {
   }
 };
 
+interface INoteWithPatient extends INote {
+  patient: IPatient;
+}
+
 export async function GET(request: NextRequest): Promise<NextResponse | void> {
   return await handler(async () => {
     const limit = Number(request.nextUrl.searchParams.get('limit')) || 1000;
     const page = Number(request.nextUrl.searchParams.get('page')) || 1;
-    const data = await db.find({
+    const merge = request.nextUrl.searchParams.get('merge');
+    const data = (await db.find({
       table: 'notes',
       limit,
       page,
-    });
+    })) as INote[];
+    // Really rough, but works for our purposes
+    if (merge && merge === 'patient') {
+      const patients = await db.find({ table: 'patients' });
+      data.forEach((note: INote) => {
+        const patient = patients.find(
+          patient => (patient as IPatient).id === note.patient_id
+        );
+        (note as INoteWithPatient).patient = patient as IPatient;
+      });
+    }
     return NextResponse.json(data, { status: 200 });
   });
 }

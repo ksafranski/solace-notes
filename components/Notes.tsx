@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { APIClient } from '../lib/api_client';
 import { INote } from '../types/note';
+import { IPatient } from '../types/patient';
 import { applyStandardDateTimeFormat } from '../lib/date_time';
 import { Col, Row, Popconfirm, Table, Button } from 'antd';
 import { SearchBar } from './SearchBar';
@@ -16,32 +17,43 @@ const api = new APIClient();
 
 interface INoteStateItem extends INote {
   hidden?: boolean; // Control search visibility
+  patient?: IPatient;
 }
 
 export function Notes(): JSX.Element {
   const [mounted, setMounted] = useState<boolean>(false); // @TODO fix render flash hack
   const [loading, setLoading] = useState<boolean>(true);
   const [notes, setNotes] = useState<INoteStateItem[]>([]);
+  const [patients, setPatients] = useState<IPatient[]>([]);
 
   const getNotes = async () => {
     setLoading(true);
-    const res = await api.call('getNotes', {});
+    const res = await api.call('getNotes', { merge: 'patient' });
     setNotes(res);
     setLoading(false);
     setMounted(true);
   };
 
+  const getPatients = async () => {
+    const res = await api.call('getPatients', {});
+    setPatients(res);
+  };
+
   // Callback for NoteEditor to handle resync on state after create/update
   const onNoteSave = (note: INote, type: 'update' | 'create') => {
+    const insertNote = Object.assign({}, note, {
+      patient: patients.find(p => p.id === note.patient_id),
+    });
     if (type === 'update') {
-      setNotes(notes.map(n => (n.id === note.id ? note : n)));
+      setNotes(notes.map(n => (n.id === insertNote.id ? insertNote : n)));
     } else if (type === 'create') {
-      setNotes([note, ...notes]);
+      setNotes([insertNote, ...notes]);
     }
   };
 
   useEffect(() => {
     getNotes();
+    getPatients();
   }, []);
 
   return (
@@ -52,6 +64,7 @@ export function Notes(): JSX.Element {
             <Col flex={0}>
               <NoteEditor
                 onSave={onNoteSave}
+                patients={patients}
                 trigger={
                   <Button
                     style={{ fontSize: '1em' }}
@@ -95,6 +108,15 @@ export function Notes(): JSX.Element {
                 },
               },
               {
+                title: 'Patient',
+                dataIndex: 'patient',
+                render: patient => (
+                  <div>
+                    {patient.first_name} {patient.last_name}
+                  </div>
+                ),
+              },
+              {
                 title: 'Created',
                 render: note => applyStandardDateTimeFormat(note.created_at),
                 width: 200,
@@ -117,6 +139,7 @@ export function Notes(): JSX.Element {
                 width: 50,
                 render: note => (
                   <NoteEditor
+                    patients={patients}
                     note={note}
                     trigger={<EditTwoTone style={{ cursor: 'pointer' }} />}
                     onSave={onNoteSave}
